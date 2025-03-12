@@ -1,0 +1,222 @@
+언리얼 엔진 스타일의 자체 엔진입니다.
+자체 엔진으로 언리얼 엔진과 다릅니다.
+이코드를 학습해서 어디가서 언리얼 엔진이 이렇더라 라고 하시면 안됩니다.
+
+- Sharpmake 사용법 및 bat 스크립트 제작, setup bat 스크립트 제작
+- EngineConsole
+- Core 모듈
+    -> [o]ModuleManager 제작(IMPLE 그 Macro만 활성화)
+- Launch 모듈 제작 (부팅 가능한 구조)
+    -> [o]GameEngine 구조 (Init, Tick loop, Exit 만들기)
+    -> [o]FEngineLoop 만들기
+    -> [o]EnginePreInit 등 제작
+    -> [o]기본 게임루프 뼈대 만들기
+    -> [o]Engine 모듈 추가
+- Core 모듈 제작 (UClass, UObject 제작 가능하게)
+    -> [o]FEngineLoop::Init() 부분 FindClass 가능하게 구현하기
+    -> [o]UClass 만들기
+    -> [o]ObjectMacros.h 만들기
+    -> [o]GUObjectArray 만들기
+    -> [o]NewObject 만들기
+    -> [o]UObject 만들기
+    -> [o]UEngine 만들기
+    -> [o]GetPrivateStaticClassBody 수동으로 호출
+- Header Parser 도입, 필요에 따라 코드 수정, 관련 스크립트 제작
+- Engine
+    -> [o]CreateDefaultObject
+    -> [o]Log추가
+- Config 제작
+    -> [o]경로 관리자 제작
+    -> [o]IniParser 추가
+    -> [o]Config 추가
+    -> [o]EngineConfig project 제작
+    -> [o]FindClass Config파일에 작성한 이름으로 만들기
+- EngineSettings 모듈 제작(그냥 Engine모듈에서 처리)
+    -> [o]UGameMapsSettings 제작
+- User Project 제작 (LoadLibrary로 유저 프로젝트 로드 정도)
+    -> [o]dll load
+    -> [o]User 설정 파일 추가
+    -> [o]Actor class 제작
+    -> [o]GameInstance, GameMode class만 추가 구현은 나중에 (설정 파일로 부터 UClass 로드 잘되는지 확인)
+- Engine 모듈 제작
+    -> [o]World(Editor), Level
+    -> [o]ActorComponent, USceneComponent, UPrimitiveComponent, UMeshComponent, UStaticMeshComponent 우선 class만 제작 구현은 나중에
+    -> [o]SpawnActor
+	-> [o]FObjectInitializer::InitProperties (우선은 관련 함수 만들어두기)
+	-> [o]AActor::PostSpawnInitialize
+- Reflection
+    -> [o]라이브러리 추가
+    -> [o]Header parser에서 reflection 되도록 기능 추가 (InitProperties 대응)
+
+- MFC추가
+    -> [o] 로그 뷰어 추가
+    -> [o] WorldOutliner
+    -> [o] Detail
+
+
+- RenderCore, RHI, Dx11 추가
+    -> [o] Dx 초기화
+    -> [o] RenderTarget 생성
+    -> [o] Present 호출
+    -> [o] RenderTarget 특정 색으로 clear
+
+    -> [o] UE에서 커스텀 쉐이더 추가 해보기
+
+    -> [o] FShaderType 만들기 및 DECLARE_SHADER_TYPE(ShaderType 등록(using 으로 ShaderName::ShaderMetaType) 및 함수들 선언) IMPLEMENT_SHADER_TYPE(함수 구현 등)
+    -> [o] ShaderCompileManager 만들기 및 쉐이더 컴파일(여기서 FShader 상속 받는 instance 생성)
+        -> [o] 쉐이더 컴파일 및 FShader 생성 및 FGlobalShaderMap* GGlobalShaderMap에 등록
+    -> [o] TShaderMapRef<FMyShaderVS> MyShaderVS(GetGlobalShaderMap()); 같이 ShaderMap에서 Shader찾을 수 있는 구조
+    -> [o] VertexDeclaration 만들기
+        -> 1. RHI 함수 호출 생성, 2. TEXTUREGRAPHENGINE_API TGlobalResource<CoreMeshVertex_Decl> g_coreMeshVertexDecl; 처럼 생성
+    -> [o] RHICreateBoundShaderState 만들기
+    -> [o] RHISetBoundShaderState 만들기
+    -> [o] RHISetBoundShaderState 만들기 (전역변수로 정점 버퍼 우선 사용하기)
+
+    -> 렌더링 파이프라인에 정점(DirectX), Shader 세팅, 그리고 Draw
+    -> [o] 우선 shader에서 간단한 삼각형 렌더링 목적으로 기능 구현하기
+    -> [o] RHISetViewport 만들기 (Direct3DDeviceIMContext->RSSetViewports)
+    -> [o] Resize 대응
+
+- StaticMeshActor 만들기
+    -> [o] CreateDefaultSubobject 만들기 (PostInitProperties에서 Actor에 저장)
+    -> [o] SceneComponent UI에 띄우기
+	-> Component 목록 및 Transform UI에 시각화
+    -> [o] FBX Loader, AssetManager, UStaticMesh
+	-> ConstructorHelpers::FObjectFinder<UStaticMesh>로 로드하는 경우
+		-> FindOrLoadObject -> StaticLoadObject  -> ResolveName -> LoadPackage -> CreateExport -> StaticConstructObject_Internal -> UStaticMesh
+		* 언리얼은 FBX 로드해서 자신들 타입으로 변환해서 관리. 우리는 일단 매번 FBX 로드
+    -> [o] VertexFactory, Material 만들기
+    -> [o] AStaticMeshActor에 Tick 만들어서 임시로 렌더링 해보기 및 렌더독으로 확인
+    -> [o] StaticMeshComponent Transform 계산 및 GUI에서 수치 변경하면 위치 등 적용 가능하도록 처리
+    -> [o] 상수버퍼 Reflection으로 Register index 자동화
+    -> [o] 에디터에서 Mesh 변경 가능하도록 처리
+    -> [o] Save Load 만들기
+        -> [o] Archive 만들기
+        -> [o] CDO와 값이 같다면 저장 하지 않도록 처리
+    -> [o] Scene 만들기
+        -> [o] Scene에 StaticMeshComponent 등록
+        -> [o] Proxy 만들기
+- [o] FApp 추가 및 DeltaTime 계산
+- [o] Editor 카메라 처리
+- [o] 계층 구조 만들기 (Setup Attachment)
+
+- PIE 제작
+    -> [o] Editor <-> PIE 제작
+    -> [o] GameInstance, GameMode 제작
+    -> [o] User Project GameInstance, GameMode 추가
+    -> [o] GameViewportClient에 맞게 View Proj 조정
+    -> [o] Spawn된 Actor BeginPlay & Tick
+    -> [o] PlayerController, PlayerInput, InputComponent 등 입력 처리
+
+- 렌더러 개선
+    -> [o] Directional Light 광원 추가
+    -> [o] 포워드로 PBR 추가
+    -> [o] 디퍼드로 PBR 포팅
+	
+	
+- 정리
+- Sharpmake: 솔루션 및 프로젝트 만들어주는 프로그램 (Engine\Source\Programs\Sharpmake)
+	- Setup.bat 파일에서 빌드 됩니다.
+	- GenerateSolution.bat에서 사용 됩니다.
+	- 유저 프로젝트의 경우 Setup.bat에서 .sproject확장자가 등록되고 이를 실행하면 GenerateSolution.bat에 추가 인자를 던지면서 실행 됩니다
+	- 그렇기 때문에 지금은 만약 엔진이 2개 이상 설치되어 있는 경우 마지막으로 Setup.bat을 실행한 엔진이 선택됩니다.
+- HeaderParser: 빌드 단계에서 PreBuildEvent
+	- see: CommonProject.build.cs conf.EventPreBuild에 추가가 되어 있습니다
+	- Setup.bat 파일에서 빌드 됩니다.
+	- 각 모듈이 빌드 되면서 관련 Header파일들을 Intermediate\HeaderParser 에 복사하고, 변경된 파일만 해더를 파싱합니다
+	- 파싱 결과를 파일이름.generated.h 로 저장합니다.
+	- 또한, Sharpmake에서 Intermediate\HeaderParser 여기 경로가 전부 등록 되어 있어서 별도의 경로 포함 없이 파일이름.generated.h를 include 할 수 있습니다.
+- vcpkg: crossplatform 패키지 관리자(MS에서 제공)
+	- 다양한 라이브러리를 자동으로 포함해주는 프로그램
+	- 원래 C++에서 라이브러리를 포함 하려면 
+		- 라이브러리 소스코드의(보통 Header) include path, Library path, 라이브러리 파일 이름 등을 포함해야 하는데
+		- 이를 자동화
+
+- 엔진 에서 바로 시작하는 방식
+	- Engine 폴더의 Setup.bat 실행 (처음 한번만; 물론 HeaderParser 등이 변경된 경우 실행 필요)
+	- Engine 폴더의 GenerateSolution.bat 실행
+	- 엔진 폴더의 SE.sln으로 시작
+- 유저 프로젝트로 시작하는 방식
+	- Engine 폴더의 UserProject내부 내용을 복사해서 원하는 폴더로 옮기고 Game.sproject 더블 클릭
+	- 만들어진 sln 실행
+	
+폴더 구조
+- Config: 설정 파일
+	- 유저 Config 파일에서 Base설정파일이름.ini를 Default설정파일이름.ini 로 덮어 쓸 수 있다
+	- Frontend 빌드 단계에서 내부 파일을 출력 폴더의 Config 폴더로 복사 (EngineConfig.build.cs 등에서 수행)
+- Content
+	- 리소스 파일들이 위치함
+	- Frontend 빌드 단계에서 내부 파일을 출력 폴더의 Content 폴더로 복사 (EngineContent.build.cs 등에서 수행)
+- Shaders
+	- Shader 파일들이 위치함
+	- Frontend 빌드 단계에서 내부 파일을 출력 폴더의 Shader 폴더로 복사 (EngineShaders.build.cs 등에서 수행)
+- Source
+	- Programs: Sharpmake, HeaderParser 등 엔진 빌드에는 직접적으로 참여하지는 않지만 다양한 작업에서 사용하는 프로그램들
+	- Runtime: 엔진 빌드에 사용하는 공용 코드 (우리는... 에디터 로직도 같이 조금 들어 있습니다)
+	- ThirdParty: 외부 라이브러리 포함용 (vcpkg에 있는 경우 Setup.bat 에서 처리 중)
+	- SE1: MFC 에디터
+
+코드 정리
+- MFC가 구동 되면서 MFC 내부의 WinMain 함수로부터 시작
+    - CMFCApplication 생성 되고
+        - CMFCApplicationDoc
+            - CMFCApplicationDoc::Serialize
+                - Save, Load 지원
+        - CMFCApplicationView
+            - CMFCApplicationView::OnInitialUpdate에서 엔진 초기화
+                - EnginePreInit
+                - EngineInit(m_hWnd): 화면 그릴 준비 포함
+        CMFCApplication::OnIdle
+            - 엔진 시뮬레이션
+            - WndProc 호출
+
+- FEngineLoop::PreInit
+    - 엔진에서 필요한 싱글턴 객체 생성
+    - 필요한 모듈 로드
+    - RHIInit()으로 RHI(DirectX11) 초기화 -> GDynamicRHI생성
+        - GDynamicRHI, CommandList를 통해서 그래픽스 명령어를 실행 할 수 있다
+    - Shader 컴파일
+    - 필요한 경우 유저 dll을 로드 한다(dll 이름은 sharpmake에서 macro에 등록 해둠)
+    - CDO 객체를 생성한다
+    
+- FEngineLoop::Init
+    - GEngine 생성
+    - GEngine::Init()
+        - Editor World 생성
+        - UWorld::InitalizeNewWorld
+            - Level 생성
+            - Scene 생성
+        - UEditorViewportClient 생성
+            - hWnd을 사용해서 Viewport 생성
+            
+- FEngineLoop::Tick
+    - Timer update (delta time 계산)
+    - GEngine Tick 호출
+        - PIE <-> SIE 전환
+        - GWorld->Tick 호출
+            - PIE 인 경우에만 Actor Tick 호출
+        - CurrentViewportClient Tick, Draw 호출
+
+- UWorld::SpawnActor
+    - NewObject로 Actor 생성
+        - FObjectInitializer 만들고 UObject의 생성자가 FObjectIntializer 인자로 받아가면 HeaderParser에서 받는 버전을 호출 하도록 만들고, 받지 않으면 기본 생성자를 호출
+        - ~FObjectInitializer에서 Template이 있으면 UProperty들을 복제
+    - PostSpawnInitialize
+        - Owner, Instigater 지정
+        - RootComponent가 없는 경우 지정
+        - RegisterAllComponents에서 Component 등록
+            - PrimitivtComponent의 경우 Scene에 Proxy 생성(렌더링 가능 하도록)
+            - UE에서는 충돌쪽도 생성. 우리는 없음
+        - FinishSpawning에서 OnConstruction (UE에서는 BP라면 추가로 ConstructionScript 호출)
+            - PostActorConstruction
+                - 플레이 중에 Spawn 된 경우 (에디터에서는 호출 안됨)
+                    - InitializeComponents
+                        - 경우에 따라 Component Activate 처리
+                    - BeginPlay
+                    
+- 에셋 로드(AssetManager)
+    - 확장자 이름으로 특정 UFactory를 통해서 로드할 수 있도록 처리 하고 있다 (FactoryCanImport)
+    - .fbx: UFbxFactory CDO를 얻어와서 로드 시도 (FactoryCreateFile)
+
+- 렌더링
+    - FSceneRenderer를 보시면 됩니다
