@@ -9,6 +9,7 @@ class GAMEPROJECT_API AServerGameMode : public AGameModeBase
 public:
 	AServerGameMode();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSceonds) override;
 
 protected:
 	std::jthread Thread;

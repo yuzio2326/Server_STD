@@ -162,3 +162,12 @@ void AServerGameMode::BeginPlay()
 		cout << Str;
 	}
 }
+
+void AServerGameMode::Tick(float DeltaSceonds)
+{
+	Super::Tick(DeltaSceonds);
+	/*if (GetAsyncKeyState(VK_F2) & 0x8000)
+	{
+		RequestEngineExit(TEXT("Test"));
+	}*/
+}

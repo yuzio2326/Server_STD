@@ -89,12 +89,12 @@ CORE_API TObjectPtr<UObject> StaticDuplicateObject(UObject* SourceObject, UObjec
 	return DupRootObject;
 }
 
-//void CORE_API RequestEngineExit(const FString ReasonString)
-//{
-//	E_LOG(Trace, TEXT("{}"), ReasonString.c_str());
-//	GIsRequestingExit = true;
-//}
-//
+void CORE_API RequestEngineExit(const FString ReasonString)
+{
+	E_LOG(Log, TEXT("{}"), ReasonString.c_str());
+	GIsRequestingExit = true;
+}
+
 FStaticConstructObjectParameters::FStaticConstructObjectParameters(UClass* InClass)
 	: Class(InClass)
 	, Name(NAME_None)

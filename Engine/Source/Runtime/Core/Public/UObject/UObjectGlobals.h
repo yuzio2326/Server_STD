@@ -4,8 +4,8 @@
 //
 //bool CORE_API IsEngineExitRequested();
 //
-//void CORE_API RequestEngineExit(const FString ReasonString);
-//
+void CORE_API RequestEngineExit(const FString ReasonString);
+
 class UClass;
 class UObject;
 struct FStaticConstructObjectParameters;

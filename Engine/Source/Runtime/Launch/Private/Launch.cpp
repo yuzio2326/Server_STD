@@ -10,6 +10,7 @@ FEngineLoop GEngineLoop;
  */
 int32 LAUNCH_API EnginePreInit(const TCHAR* CmdLine)
 {
+	SetThreadDescription(GetCurrentThread(), TEXT("Game Thread"));
 	int32 ErrorLevel = GEngineLoop.PreInit(CmdLine);
 
 	return(ErrorLevel);
