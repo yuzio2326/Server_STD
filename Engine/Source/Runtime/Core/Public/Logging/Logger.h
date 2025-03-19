@@ -40,7 +40,7 @@ inline const TCHAR* GetLogName(ELogVerbosity InLogLevel)
 }
 
 // CUSTOM_LOG_THREAD 가 1이면 스레드 학습 용 Log Thread를 활성화 합니다
-#define CUSTOM_LOG_THREAD 1
+#define CUSTOM_LOG_THREAD 0
 
 
 class CORE_API FLogger

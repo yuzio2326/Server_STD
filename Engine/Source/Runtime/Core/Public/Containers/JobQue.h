@@ -10,8 +10,11 @@ public:
 	{
 		if (!NewJob)
 		{
-			_ASSERT(false);
-			return;
+			if (!bShutdown)
+			{
+				_ASSERT(false);
+				return;
+			}
 		}
 
 		//task push

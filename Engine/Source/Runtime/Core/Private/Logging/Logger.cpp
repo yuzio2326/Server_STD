@@ -39,8 +39,10 @@ FLogger* FLogger::Get(const bool bDestroy)
 	static unique_ptr<FLogger> Instance = make_unique<FLogger>();
 	if (bDestroy)
 	{
+#if CUSTOM_LOG_THREAD
 		Instance->JobQueue.Shutdown();
 		Instance->LogThread.join();
+#endif
 		Instance.reset();
 		return nullptr;
 	}
